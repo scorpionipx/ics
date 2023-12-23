@@ -37,6 +37,7 @@ class GServer:
         self.echo_mode_on = False
 
         self.__client = None
+        self.__restart = False
 
         try:
             self.__can = can.interface.Bus(interface='socketcan', channel='can0', bitrate=500000)
@@ -211,7 +212,13 @@ class GServer:
         :return: None
         """
         while self.echo_mode_on:
-            incoming_package = self.__get_package_from_client__()
+            try:
+                incoming_package = self.__get_package_from_client__()
+            except ConnectionResetError:
+                self.stop()
+                self.__connection = self.__start()
+                self.connect_with_client()
+                incoming_package = self.__get_package_from_client__()
 
             self.__log_info("echo mode - received package: {} - {}".format(incoming_package, len(incoming_package)))
 
@@ -286,6 +293,8 @@ def main():
         gs.echo()
     except KeyboardInterrupt:
         gs.stop()
+    except ConnectionResetError:
+        gs.echo()
     gs.stop()
 
 
