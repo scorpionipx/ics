@@ -284,7 +284,7 @@ class GServer:
 
 def main():
     """"""
-    time.sleep(5)
+    time.sleep(20)
     gs = GServer(
         port=8069,
     )
