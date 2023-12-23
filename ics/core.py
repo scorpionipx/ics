@@ -1,6 +1,9 @@
 import pathlib
 import socket
-import can
+try:
+    import can
+except:
+    pass
 import sys
 import threading
 
@@ -213,15 +216,30 @@ class GServer:
             self.__log_info("echo mode - received package: {} - {}".format(incoming_package, len(incoming_package)))
 
             speed = incoming_package[0] << 8 | incoming_package[1]
+            speed *= 89.6 * 1.09
             print(speed)
 
             rpm = incoming_package[2] << 8 | incoming_package[3]
+            rpm *= 1.02
             print(rpm)
+
+            package = []
+            speed_bytes = int(speed).to_bytes(2, 'big', signed=False)
+            print(speed_bytes)
+            rpm_bytes = int(rpm).to_bytes(2, 'big', signed=False)
+            print(rpm_bytes)
+
+            for b in rpm_bytes:
+                package.append(int(b))
+            package.extend([69, 69])
+            for b in speed_bytes:
+                package.append(int(b))
+            package.extend([69, 69])
 
             if self.__can:
                 try:
                     tx_msg = can.Message(arbitration_id=0x201,
-                                         data=[69, 69, 69, 69, 69, 69, 69, 69, ], is_extended_id=False)
+                                         data=package, is_extended_id=False)
                     self.__can.send(tx_msg)
                 except Exception as exception:
                     error = f'Failed to send CAN msg: {exception}'
