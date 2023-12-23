@@ -1,5 +1,6 @@
 import pathlib
 import socket
+import can
 import sys
 import threading
 
@@ -33,6 +34,13 @@ class GServer:
         self.echo_mode_on = False
 
         self.__client = None
+
+        try:
+            self.__can = can.interface.Bus('can0', bustype='socketcan')
+        except Exception as exception:
+            self.__can = None
+            error = f'Failed to init CAN: {exception}'
+            self.__log_error(error)
 
     def connect_with_client(self):
         """connect_with_client
@@ -199,30 +207,25 @@ class GServer:
             Thread echo.
         :return: None
         """
-        lost_connection_packages_counter = 0
         while self.echo_mode_on:
             incoming_package = self.__get_package_from_client__()
 
-            decoded_package = incoming_package.decode(encoding=self.__encoding)
-            self.__log_info("echo mode - received package: {} - {}".format(decoded_package, len(decoded_package)))
-            sent = False
+            self.__log_info("echo mode - received package: {} - {}".format(incoming_package, len(incoming_package)))
 
-            if not sent:
-                self.send_package(decoded_package)
+            speed = incoming_package[0] << 8 | incoming_package[1]
+            print(speed)
 
-            if decoded_package == LOST_CONNECTION_PACKAGE:
-                self.__log_info("echo mode - received null package")
-                lost_connection_packages_counter += 1
+            rpm = incoming_package[2] << 8 | incoming_package[3]
+            print(rpm)
 
-                if lost_connection_packages_counter >= LOST_CONNECTION_PACKAGES_LIMIT:
-                    self.__log_info("Number of null packages received exceeded limit of {}!"
-                                    .format(LOST_CONNECTION_PACKAGES_LIMIT))
-                    self.stop_echo()
-
-                continue
-
-            if 'stop echo' in decoded_package:
-                self.stop_echo()
+            if self.__can:
+                try:
+                    tx_msg = can.Message(arbitration_id=0x201,
+                                         data=[69, 69, 69, 69, 69, 69, 69, 69, ], extended_id=False)
+                    self.__can.send(tx_msg)
+                except Exception as exception:
+                    error = f'Failed to send CAN msg: {exception}'
+                    self.__log_error(error)
 
     def echo(self):
         """echo
