@@ -241,6 +241,15 @@ class GServer:
                     tx_msg = can.Message(arbitration_id=0x201,
                                          data=package, is_extended_id=False)
                     self.__can.send(tx_msg)
+                    tx_msg = can.Message(arbitration_id=0x212,
+                                         data=[0, 0, 0, 0, 0, 0, 0, 0, ], is_extended_id=False)
+                    self.__can.send(tx_msg)
+                    tx_msg = can.Message(arbitration_id=0x420,
+                                         data=[0, 0, 0, 0, 0, 0, 0, 0x9b, ], is_extended_id=False)
+                    self.__can.send(tx_msg)
+                    tx_msg = can.Message(arbitration_id=0x422,
+                                         data=[0, 0, 0, 0, 0, 0, 0, 0, ], is_extended_id=False)
+                    self.__can.send(tx_msg)
                 except Exception as exception:
                     error = f'Failed to send CAN msg: {exception}'
                     self.__log_error(error)
