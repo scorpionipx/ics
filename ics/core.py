@@ -245,7 +245,7 @@ class GServer:
                                          data=[0, 0, 0, 0, 0, 0, 0, 0, ], is_extended_id=False)
                     self.__can.send(tx_msg)
                     tx_msg = can.Message(arbitration_id=0x420,
-                                         data=[0, 0, 0, 0, 0, 0, 0, 0x9b, ], is_extended_id=False)
+                                         data=[0x9b, 0, 0, 0, 0, 0, 0, 0, ], is_extended_id=False)
                     self.__can.send(tx_msg)
                     tx_msg = can.Message(arbitration_id=0x422,
                                          data=[0, 0, 0, 0, 0, 0, 0, 0, ], is_extended_id=False)
