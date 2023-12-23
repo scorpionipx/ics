@@ -36,7 +36,7 @@ class GServer:
         self.__client = None
 
         try:
-            self.__can = can.interface.Bus('can0', bustype='socketcan')
+            self.__can = can.interface.Bus(interface='socketcan', channel='can0', bitrate=500000)
         except Exception as exception:
             self.__can = None
             error = f'Failed to init CAN: {exception}'
@@ -221,7 +221,7 @@ class GServer:
             if self.__can:
                 try:
                     tx_msg = can.Message(arbitration_id=0x201,
-                                         data=[69, 69, 69, 69, 69, 69, 69, 69, ], extended_id=False)
+                                         data=[69, 69, 69, 69, 69, 69, 69, 69, ], is_extended_id=False)
                     self.__can.send(tx_msg)
                 except Exception as exception:
                     error = f'Failed to send CAN msg: {exception}'
