@@ -4,8 +4,8 @@ import time
 
 try:
     import can
-except:
-    pass
+except Exception as exception:
+    print(f'Failed to import can module: {exception}')
 import sys
 import threading
 
@@ -284,7 +284,7 @@ class GServer:
 
 def main():
     """"""
-    time.sleep(20)
+    time.sleep(5)
     gs = GServer(
         port=8069,
     )
