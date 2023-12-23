@@ -1,5 +1,7 @@
 import pathlib
 import socket
+import time
+
 try:
     import can
 except:
@@ -224,17 +226,13 @@ class GServer:
 
             speed = incoming_package[0] << 8 | incoming_package[1]
             speed *= 89.6 * 1.09
-            print(speed)
 
             rpm = incoming_package[2] << 8 | incoming_package[3]
             rpm *= 1.02
-            print(rpm)
 
             package = []
             speed_bytes = int(speed).to_bytes(2, 'big', signed=False)
-            print(speed_bytes)
             rpm_bytes = int(rpm).to_bytes(2, 'big', signed=False)
-            print(rpm_bytes)
 
             for b in rpm_bytes:
                 package.append(int(b))
@@ -286,6 +284,7 @@ class GServer:
 
 def main():
     """"""
+    time.sleep(20)
     gs = GServer(
         port=8069,
     )
